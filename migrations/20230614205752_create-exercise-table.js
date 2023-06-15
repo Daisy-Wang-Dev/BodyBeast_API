@@ -4,7 +4,7 @@
  */
 exports.up = function (knex) {
   return knex.schema.createTable("exercise", (table) => {
-    table.increments("id");
+    table.increments("id").primary();
     table.string("name").notNullable();
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table
@@ -18,5 +18,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-    return knex.schema.dropTable("exercise")
+  return knex.schema.dropTable("exercise");
 };
