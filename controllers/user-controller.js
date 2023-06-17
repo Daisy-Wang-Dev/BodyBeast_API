@@ -64,6 +64,23 @@ const addUser = async (req, res) => {
   }
 };
 
+const remove = async (req, res) => {
+  try {
+    await knex("warehouses").where({ id: req.params.userId }).del();
+    res
+      .status(204)
+      .send(
+        "Your account has been deleted. We're looking forward to seeing you back"
+      );
+  } catch (err) {
+    res.status(500).json({
+      error: true,
+      message: `error deleting user with ID: ${req.params.userId}`,
+      details: `${err.message}`,
+    });
+  }
+};
+
 module.exports = {
   single,
   addUser,
