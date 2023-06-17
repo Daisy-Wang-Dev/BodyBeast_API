@@ -4,7 +4,7 @@ const knex = require("knex")(require("../knexfile"));
 const single = async (req, res) => {
   try {
     const user = await knex("user")
-      .select("id", "name", "user_name", "email", "password", "date_of_birth")
+      .select("id", "name", "user_name", "email", "date_of_birth")
       .where({ id: req.params.userId });
     if (user.length === 0) {
       return res.status(404).json({
