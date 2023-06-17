@@ -22,27 +22,44 @@ const single = async (req, res) => {
   }
 };
 
-// Create a new user
+// Register a new user
 const addUser = async (req, res) => {
+  const { name, user_name, email, password, date_of_birth, mode } = req.body;
+
+  if (!name || !user_name || !email || !password || !date_of_birth || !mode) {
+    return res.status(400).send("Please enter the required fields.");
+  }
+
+  const newUserData = {
+    name,
+    user_name,
+    email,
+    password,
+    date_of_birth,
+    mode,
+  };
+
   try {
-    const newUser = await knex("user").insert(req.body);
-    const addedUser = await knex("user").select(
-      "id",
-      "name",
-      "user_name",
-      "email",
-      "date_of_birth"
-    )
-    .where({
-      id: newUser[0]
-    });
-    res.status(201).json(addedUser);
-    
+    const newUser = await knex("user").insert(newUserData);
+    const addedUser = await knex("user")
+      .select(
+        "id",
+        "name",
+        "user_name",
+        "email",
+        "password",
+        "date_of_birth",
+        "mode"
+      )
+      .where({
+        id: newUser[0],
+      });
+    res.status(201).json(addedUser[0]);
   } catch (err) {
     res.status(500).json({
       error: true,
       message: `error creating new user: ${req.body.user_name}`,
-      details: `${error.message}`,
+      details: `${err.message}`,
     });
   }
 };

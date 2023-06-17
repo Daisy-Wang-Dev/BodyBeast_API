@@ -6,9 +6,9 @@ exports.up = function (knex) {
   return knex.schema.createTable("user", (table) => {
     table.increments("id").primary();
     table.string("name", 255).notNullable();
-    table.string("user_name", 270).notNullable();
-    table.string("email").notNullable();
-    // table.string("password").notNullable();remove from the table
+    table.string("user_name", 270).notNullable().unique();
+    table.string("email").notNullable().unique();
+    table.string("password").notNullable();
     table.date("date_of_birth").notNullable(); //YYYY-MM-DD
     table.string("mode").notNullable(); //drop box selection
     table.timestamp("created_at").defaultTo(knex.fn.now());
