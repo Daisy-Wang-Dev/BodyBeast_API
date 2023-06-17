@@ -1,5 +1,18 @@
 const knex = require("knex")(require("../knexfile"));
 
+// Validation
+// If the userId existed
+const isExistedId = async (req, res) => {
+  const result = await knex("user").where({ id: req.params.userId }).first();
+
+  if (!result) {
+    return res.status(404).json({
+      error: true,
+      message: `Invalid request. User ID: ${req.params.userId} does not exist. Please provide a valid user ID`,
+    });
+  }
+};
+
 // Get single user
 const single = async (req, res) => {
   try {
@@ -58,24 +71,24 @@ const addUser = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       error: true,
-      message: `error creating new user: ${req.body.user_name}`,
+      message: `Error creating new user: ${req.body.user_name}`,
       details: `${err.message}`,
     });
   }
 };
 
 const remove = async (req, res) => {
+  if (await isExistedId(req, res)) {
+    return;
+  }
   try {
-    await knex("warehouses").where({ id: req.params.userId }).del();
-    res
-      .status(204)
-      .send(
-        "Your account has been deleted. We're looking forward to seeing you back"
-      );
+    await knex("user").where({ id: req.params.userId }).del();
+    
+    res.status(204).send();
   } catch (err) {
     res.status(500).json({
       error: true,
-      message: `error deleting user with ID: ${req.params.userId}`,
+      message: `Error deleting user with ID: ${req.params.userId}`,
       details: `${err.message}`,
     });
   }
@@ -84,4 +97,5 @@ const remove = async (req, res) => {
 module.exports = {
   single,
   addUser,
+  remove,
 };
