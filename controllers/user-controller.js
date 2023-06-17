@@ -22,6 +22,32 @@ const single = async (req, res) => {
   }
 };
 
+// Create a new user
+const addUser = async (req, res) => {
+  try {
+    const newUser = await knex("user").insert(req.body);
+    const addedUser = await knex("user").select(
+      "id",
+      "name",
+      "user_name",
+      "email",
+      "date_of_birth"
+    )
+    .where({
+      id: newUser[0]
+    });
+    res.status(201).json(addedUser);
+    
+  } catch (err) {
+    res.status(500).json({
+      error: true,
+      message: `error creating new user: ${req.body.user_name}`,
+      details: `${error.message}`,
+    });
+  }
+};
+
 module.exports = {
   single,
+  addUser,
 };
