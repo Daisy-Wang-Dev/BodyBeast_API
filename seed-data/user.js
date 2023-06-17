@@ -6,5 +6,6 @@ module.exports = [
     email: "daisy@example.com",
     // password: "password123",
     date_of_birth: "1998-06-12",
+    mode: "Cutting",
   },
 ];

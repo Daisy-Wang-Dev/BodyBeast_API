@@ -10,6 +10,7 @@ exports.up = function (knex) {
     table.string("email").notNullable();
     // table.string("password").notNullable();remove from the table
     table.date("date_of_birth").notNullable(); //YYYY-MM-DD
+    table.string("mode").notNullable(); //drop box selection
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table
       .timestamp("updated_at")
