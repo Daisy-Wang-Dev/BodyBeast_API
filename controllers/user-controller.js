@@ -77,13 +77,14 @@ const addUser = async (req, res) => {
   }
 };
 
+// Delete a current user
 const remove = async (req, res) => {
   if (await isExistedId(req, res)) {
     return;
   }
   try {
     await knex("user").where({ id: req.params.userId }).del();
-    
+
     res.status(204).send();
   } catch (err) {
     res.status(500).json({
@@ -94,8 +95,28 @@ const remove = async (req, res) => {
   }
 };
 
+// Update a current user
+const update = async (req, res) => {
+  
+  try {
+    await knex("user").where({ id: req.params.userId }).update(req.body);
+
+    const updatedProfile = await knex("user")
+      .select("id", "name", "user_name", "email", "date_of_birth", "mode")
+      .where({ id: req.params.userId });
+    res.status(200).json(updatedProfile);
+  } catch (err) {
+    res.status(500).json({
+      error: true,
+      message: `Error updating user with ID: ${req.params.userId}`,
+      details: `${err.message}`,
+    });
+  }
+};
+
 module.exports = {
   single,
   addUser,
   remove,
+  update,
 };
