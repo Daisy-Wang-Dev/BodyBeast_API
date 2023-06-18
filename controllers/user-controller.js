@@ -136,15 +136,17 @@ const routines = async (req, res) => {
     const userRoutines = await knex("user")
       .join("routine", "routine.user_id", "=", "user.id")
       .where({ user_id: req.params.userId })
-      .select("routine.user_id", "routine.name");
+      .select("routine.user_id", "routine.name", "routine.created_at");
 
-    const uniqueRoutines = Array.from(
-      new Set(userRoutines.map((userRoutine) => userRoutine.name))
-    ).map((routineName) => {
-      return { user_id: req.params.userId, routineName };
-    });
+    // To avoid getting duplications of the same routine 
+    // can do this on the frontend instead as the history page uses the same Get request
+    // const uniqueRoutines = Array.from(
+    //   new Set(userRoutines.map((userRoutine) => userRoutine.name))
+    // ).map((routineName) => {
+    //   return {user_id: req.params.userId, name:routineName };
+    // });
 
-    res.status(200).json(uniqueRoutines);
+    res.status(200).json(userRoutines);
   } catch (err) {
     res.status(500).json({
       error: true,
