@@ -136,7 +136,7 @@ const routines = async (req, res) => {
     const userRoutines = await knex("user")
       .join("routine", "routine.user_id", "=", "user.id")
       .where({ user_id: req.params.userId })
-      .select("routine.user_id", "routine.name", "routine.created_at");
+      .select("routine.id","routine.user_id", "routine.name", "routine.created_at");
 
     // To avoid getting duplications of the same routine 
     // can do this on the frontend instead as the history page uses the same Get request

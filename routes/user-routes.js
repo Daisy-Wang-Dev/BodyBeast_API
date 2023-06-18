@@ -13,5 +13,6 @@ router
   .route("/:userId/routine")
   .get(userController.routines)
 
+router.route("/:userId/routine/:routineId")
 
 module.exports = router;
