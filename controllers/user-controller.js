@@ -1,4 +1,5 @@
 const knex = require("knex")(require("../knexfile"));
+const emailFormat = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
 
 // Validation
 // If the userId existed
@@ -97,7 +98,22 @@ const remove = async (req, res) => {
 
 // Update a current user
 const update = async (req, res) => {
-  
+  const { name, user_name, email, date_of_birth, mode } = req.body;
+  // Email validation
+  if (!email.match(emailFormat)) {
+    return res.status(400).json({
+      error: true,
+      message: `${email} is not a valid email. Please enter a valid email.`,
+    });
+  }
+  // Validate all fields are filled
+  if (!name || !user_name || !email || !date_of_birth || !mode) {
+    return res.status(400).json({
+      error: true,
+      message: `Please fill in all of the required fields`,
+    });
+  }
+
   try {
     await knex("user").where({ id: req.params.userId }).update(req.body);
 
