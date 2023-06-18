@@ -130,9 +130,34 @@ const update = async (req, res) => {
   }
 };
 
+// Get all routines for a give user
+const routines = async (req, res) => {
+  try {
+    const userRoutines = await knex("user")
+      .join("routine", "routine.user_id", "=", "user.id")
+      .where({ user_id: req.params.userId })
+      .select("routine.user_id", "routine.name");
+
+    const uniqueRoutines = Array.from(
+      new Set(userRoutines.map((userRoutine) => userRoutine.name))
+    ).map((routineName) => {
+      return { user_id: req.params.userId, routineName };
+    });
+
+    res.status(200).json(uniqueRoutines);
+  } catch (err) {
+    res.status(500).json({
+      error: true,
+      message: `Error getting routines for user with ID: ${req.params.userId}`,
+      details: `${err.message}`,
+    });
+  }
+};
+
 module.exports = {
   single,
   addUser,
   remove,
   update,
+  routines,
 };

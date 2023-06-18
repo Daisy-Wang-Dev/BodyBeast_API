@@ -8,4 +8,6 @@ router
   .put(userController.update)
   .delete(userController.remove);
 
+router.route("/:userId/routines").get(userController.routines)
+
 module.exports = router;
