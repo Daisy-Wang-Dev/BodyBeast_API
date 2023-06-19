@@ -9,10 +9,10 @@ router
   .put(userController.update)
   .delete(userController.remove);
 
-router
-  .route("/:userId/routine")
-  .get(userController.routines)
+router.route("/:userId/routine").get(userController.routines);
 
-router.route("/:userId/routine/:routineId")
+router.route("/:userId/history").get(routineController.histories);
+
+
 
 module.exports = router;
