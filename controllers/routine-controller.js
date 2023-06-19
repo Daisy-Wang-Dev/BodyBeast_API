@@ -81,13 +81,19 @@ const historyDetails = async (req, res) => {
 
 // Get all exercises for a given routine of a given user
 const exercises = async (req, res) => {
+  if (!req.params.routineId) {
+    return res.status(404).json({
+      error: true,
+      message: `No routine found with ID ${req.params.routineId}`,
+    });
+  }
   try {
     const userRoutine = await knex("user")
       .join("routine", "routine.user_id", "=", "user.id")
       .select("routine.user_id", "routine.id", "routine.name")
       .where({ user_id: req.params.userId })
       .where({ "routine.id": req.params.routineId });
-      
+
     const exerciseInRoutine = await knex("exercise_routine")
       .join("exercise", "exercise_routine.exercise_id", "=", "exercise.id")
       .select("exercise.id", "exercise.name")
