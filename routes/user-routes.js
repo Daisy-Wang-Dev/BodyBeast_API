@@ -13,6 +13,8 @@ router.route("/:userId/routine").get(userController.routines);
 
 router.route("/:userId/history").get(routineController.histories);
 
+router.route("/:userId/history/:routineId").get(routineController.historyDetails)
 
+router.route("/:userId/:exerciseId").get(routineController.test)
 
 module.exports = router;
