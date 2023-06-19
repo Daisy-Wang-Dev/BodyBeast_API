@@ -135,17 +135,12 @@ const routines = async (req, res) => {
   try {
     const userRoutines = await knex("user")
       .join("routine", "routine.user_id", "=", "user.id")
+      .select("routine.user_id", "routine.id", "routine.name")
       .where({ user_id: req.params.userId })
-      .select("routine.user_id", "routine.name");
+      .orderBy("routine.created_at", "desc")
+      .first();
 
-    // To avoid getting duplications of the same routine 
-    const uniqueRoutines = Array.from(
-      new Set(userRoutines.map((userRoutine) => userRoutine.name))
-    ).map((routineName) => {
-      return {user_id: req.params.userId, name:routineName };
-    });
-
-    res.status(200).json(uniqueRoutines);
+    res.status(200).json(userRoutines);
   } catch (err) {
     res.status(500).json({
       error: true,

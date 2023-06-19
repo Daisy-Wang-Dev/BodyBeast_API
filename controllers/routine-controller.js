@@ -55,12 +55,12 @@ const historyDetails = async (req, res) => {
       exercises: [],
     };
 
-    // Return an array of unique names 
+    // Return an array of unique names
     const exerciseNames = Array.from(
       new Set(exerciseInRoutine.map((exercise) => exercise.name))
     );
 
-   // Get weights and reps for each exercise 
+    // Get weights and reps for each exercise
     exerciseNames.forEach((name) => {
       const exerciseSets = exerciseInRoutine
         .filter((exercise) => exercise.name === name)
@@ -79,14 +79,41 @@ const historyDetails = async (req, res) => {
   }
 };
 
-const test = async (req, res) => {
+// Get all exercises for a given routine of a given user
+const exercises = async (req, res) => {
   try {
-    testData = await knex("exercise").where({ id: req.params.exerciseId });
-    res.status(200).json(testData);
-  } catch (err) {}
+    const userRoutine = await knex("user")
+      .join("routine", "routine.user_id", "=", "user.id")
+      .select("routine.user_id", "routine.id", "routine.name")
+      .where({ user_id: req.params.userId })
+      .where({ "routine.id": req.params.routineId });
+      
+    const exerciseInRoutine = await knex("exercise_routine")
+      .join("exercise", "exercise_routine.exercise_id", "=", "exercise.id")
+      .select("exercise.id", "exercise.name")
+      .where({ "exercise_routine.routine_id": req.params.routineId });
+
+    const exercises = exerciseInRoutine.map((exercise) => exercise.name);
+
+    const response = {
+      user_id: req.params.userId,
+      id: req.params.routineId,
+      name: userRoutine[0].name,
+      exercises,
+    };
+
+    res.status(200).json(response);
+  } catch (err) {
+    res.status(500).json({
+      error: true,
+      message: `Error getting exercises in this routine for user with ID: ${req.params.userId}`,
+      details: `${err.message}`,
+    });
+  }
 };
 
 module.exports = {
   histories,
   historyDetails,
+  exercises,
 };

@@ -11,6 +11,8 @@ router
 
 router.route("/:userId/routine").get(userController.routines);
 
+router.route("/:userId/routine/:routineId/exercises").get(routineController.exercises)
+
 router.route("/:userId/history").get(routineController.histories);
 
 router.route("/:userId/history/:routineId").get(routineController.historyDetails)
