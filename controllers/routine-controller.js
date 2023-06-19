@@ -2,6 +2,26 @@ const routine = require("../seed-data/routine");
 
 const knex = require("knex")(require("../knexfile"));
 
+// Get all routines for a give user
+const routines = async (req, res) => {
+  try {
+    const userRoutines = await knex("user")
+      .join("routine", "routine.user_id", "=", "user.id")
+      .select("routine.user_id", "routine.id", "routine.name")
+      .where({ user_id: req.params.userId })
+      .orderBy("routine.created_at", "desc")
+      .first();
+
+    res.status(200).json(userRoutines);
+  } catch (err) {
+    res.status(500).json({
+      error: true,
+      message: `Error getting routines for user with ID: ${req.params.userId}`,
+      details: `${err.message}`,
+    });
+  }
+};
+
 // Get all histories for a given user
 const histories = async (req, res) => {
   try {
@@ -119,6 +139,7 @@ const exercises = async (req, res) => {
 };
 
 module.exports = {
+  routines,
   histories,
   historyDetails,
   exercises,

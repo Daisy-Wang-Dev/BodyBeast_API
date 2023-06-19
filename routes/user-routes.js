@@ -9,7 +9,7 @@ router
   .put(userController.update)
   .delete(userController.remove);
 
-router.route("/:userId/routine").get(userController.routines);
+router.route("/:userId/routine").get(routineController.routines);
 
 router.route("/:userId/routine/:routineId/exercises").get(routineController.exercises)
 
