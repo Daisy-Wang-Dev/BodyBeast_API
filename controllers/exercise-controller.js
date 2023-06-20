@@ -1,5 +1,6 @@
 const knex = require("knex")(require("../knexfile"));
 
+// Get all exercise volume metric
 const exerciseData = async (req, res) => {
   try {
     // First get all exercises for a given user
@@ -42,7 +43,6 @@ const exerciseData = async (req, res) => {
     );
     res.status(200).json(exerciseData);
 
-    // res.status(200).json(response);
   } catch (err) {
     res.status(500).json({
       error: true,
