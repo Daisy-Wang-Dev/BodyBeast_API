@@ -58,12 +58,12 @@ const historyDetails = async (req, res) => {
       )
       .where({ user_id: req.params.userId });
 
-    // Get exercises for a given routine (maybe a join with set)
+    // Get exercises for a given routine 
     const exerciseInRoutine = await knex("routine")
       .join("exercise_routine", "exercise_routine.routine_id", "routine.id")
       .join("exercise", "exercise_routine.exercise_id", "=", "exercise.id")
       .join("set", "set.exercise_routine_id", "=", "exercise_routine.id")
-      .select("exercise.name", "set.weight", "set.rep")
+      .select("exercise.name", "set.weight", "set.rep", "set.volume")
       .where({ user_id: req.params.userId })
       .where({ "routine.id": req.params.routineId });
 
@@ -84,7 +84,7 @@ const historyDetails = async (req, res) => {
     exerciseNames.forEach((name) => {
       const exerciseSets = exerciseInRoutine
         .filter((exercise) => exercise.name === name)
-        .map((exercise) => ({ weight: exercise.weight, reps: exercise.rep }));
+        .map((exercise) => ({ weight: exercise.weight, reps: exercise.rep, volume: exercise.volume }));
 
       response.exercises.push({ exercise_name: name, sets: exerciseSets });
     });
