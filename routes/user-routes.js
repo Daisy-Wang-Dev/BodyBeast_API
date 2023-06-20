@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const userController = require("../controllers/user-controller");
 const routineController = require("../controllers/routine-controller");
+const exerciseController = require("../controllers/exercise-controller");
+
 
 router.route("/").post(userController.addUser);
 router
@@ -8,6 +10,8 @@ router
   .get(userController.single)
   .put(userController.update)
   .delete(userController.remove);
+
+router.route("/:userId/exercises").get(exerciseController.exerciseData);
 
 router.route("/:userId/routine").get(routineController.routines);
 
