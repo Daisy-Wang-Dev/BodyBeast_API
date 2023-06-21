@@ -7,10 +7,11 @@ const routines = async (req, res) => {
   try {
     const userRoutines = await knex("user")
       .join("routine", "routine.user_id", "=", "user.id")
-      .select("routine.user_id", "routine.id", "routine.name")
+      .select("routine.user_id", "routine.id", "routine.name", "routine.created_at")
       .where({ user_id: req.params.userId })
       .orderBy("routine.created_at", "desc")
-      .first();
+      .groupBy("routine.user_id","routine.id","routine.name", "routine.created_at")
+      .havingRaw("routine.created_at = MAX(routine.created_at)");
 
     res.status(200).json(userRoutines);
   } catch (err) {
