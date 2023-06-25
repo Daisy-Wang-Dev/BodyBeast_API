@@ -18,7 +18,15 @@ const isExistedId = async (req, res) => {
 const single = async (req, res) => {
   try {
     const user = await knex("user")
-      .select("id", "name", "user_name", "email", "date_of_birth", "mode")
+      .select(
+        "id",
+        "name",
+        "user_name",
+        "email",
+        knex.raw("DATE_FORMAT(date_of_birth, '%Y-%m-%d') AS date_of_birth"),
+        knex.raw("DATE_FORMAT(updated_at, '%Y-%m-%d') AS updated_at"),
+        "mode"
+      )
       .where({ id: req.params.userId });
     if (user.length === 0) {
       return res.status(404).json({
@@ -26,7 +34,7 @@ const single = async (req, res) => {
         message: `User with ID: ${req.params.userId} is not found`,
       });
     }
-    res.status(200).json(user);
+    res.status(200).json(user[0]);
   } catch (err) {
     res.status(500).json({
       error: true,
@@ -120,7 +128,7 @@ const update = async (req, res) => {
     const updatedProfile = await knex("user")
       .select("id", "name", "user_name", "email", "date_of_birth", "mode")
       .where({ id: req.params.userId });
-    res.status(200).json(updatedProfile);
+    res.status(200).json(updatedProfile[0]);
   } catch (err) {
     res.status(500).json({
       error: true,
