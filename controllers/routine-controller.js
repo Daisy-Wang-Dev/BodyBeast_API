@@ -139,6 +139,8 @@ const exercises = async (req, res) => {
   }
 };
 
+// Post completed routine and all exercise details as new entries
+
 module.exports = {
   routines,
   histories,
