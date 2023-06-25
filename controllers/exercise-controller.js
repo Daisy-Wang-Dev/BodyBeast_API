@@ -32,7 +32,7 @@ const exerciseData = async (req, res) => {
           .join("user", "user.id", "=", "routine.user_id")
           .select(
             knex.raw("SUM(set.weight * set.rep) AS total_volume"),
-            "routine.created_at"
+            knex.raw("DATE_FORMAT(routine.created_at, '%Y-%m-%d') AS created_at")
           )
           .groupBy("routine.created_at")
           .where({ user_id: req.params.userId })

@@ -7,10 +7,20 @@ const routines = async (req, res) => {
   try {
     const userRoutines = await knex("user")
       .join("routine", "routine.user_id", "=", "user.id")
-      .select("routine.user_id", "routine.id", "routine.name", "routine.created_at")
+      .select(
+        "routine.user_id",
+        "routine.id",
+        "routine.name",
+        "routine.created_at"
+      )
       .where({ user_id: req.params.userId })
       .orderBy("routine.created_at", "desc")
-      .groupBy("routine.user_id","routine.id","routine.name", "routine.created_at")
+      .groupBy(
+        "routine.user_id",
+        "routine.id",
+        "routine.name",
+        "routine.created_at"
+      )
       .havingRaw("routine.created_at = MAX(routine.created_at)");
 
     res.status(200).json(userRoutines);
@@ -33,7 +43,7 @@ const histories = async (req, res) => {
         "routine.id",
         "routine.user_id",
         "routine.name",
-        "routine.created_at"
+        knex.raw("DATE_FORMAT(routine.created_at, '%Y-%m-%d') AS created_at")
       );
     res.status(200).json(routineHistories);
   } catch (err) {
@@ -55,16 +65,21 @@ const historyDetails = async (req, res) => {
         "routine.user_id",
         "routine.id",
         "routine.name",
-        "routine.created_at"
+        knex.raw("DATE_FORMAT(routine.created_at, '%Y-%m-%d') AS created_at")
       )
       .where({ user_id: req.params.userId });
 
-    // Get exercises for a given routine 
+    // Get exercises for a given routine
     const exerciseInRoutine = await knex("routine")
       .join("exercise_routine", "exercise_routine.routine_id", "routine.id")
       .join("exercise", "exercise_routine.exercise_id", "=", "exercise.id")
       .join("set", "set.exercise_routine_id", "=", "exercise_routine.id")
-      .select("exercise.name", "set.weight", "set.rep", "set.volume")
+      .select(
+        "exercise.name",
+        "set.weight",
+        "set.rep",
+        knex.raw("(set.weight * set.rep) AS volume")
+      )
       .where({ user_id: req.params.userId })
       .where({ "routine.id": req.params.routineId });
 
@@ -85,7 +100,11 @@ const historyDetails = async (req, res) => {
     exerciseNames.forEach((name) => {
       const exerciseSets = exerciseInRoutine
         .filter((exercise) => exercise.name === name)
-        .map((exercise) => ({ weight: exercise.weight, reps: exercise.rep, volume: exercise.volume }));
+        .map((exercise) => ({
+          weight: exercise.weight,
+          reps: exercise.rep,
+          volume: exercise.volume,
+        }));
 
       response.exercises.push({ exercise_name: name, sets: exerciseSets });
     });
