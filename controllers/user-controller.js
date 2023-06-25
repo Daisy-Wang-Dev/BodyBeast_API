@@ -18,7 +18,7 @@ const isExistedId = async (req, res) => {
 const single = async (req, res) => {
   try {
     const user = await knex("user")
-      .select("id", "name", "user_name", "email", "date_of_birth")
+      .select("id", "name", "user_name", "email", "date_of_birth", "mode")
       .where({ id: req.params.userId });
     if (user.length === 0) {
       return res.status(404).json({
