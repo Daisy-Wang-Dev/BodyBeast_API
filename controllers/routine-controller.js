@@ -159,10 +159,57 @@ const exercises = async (req, res) => {
 };
 
 // Post completed routine and all exercise details as new entries
+const newCompletedRoutine = async (req, res) => {
+  const {userId} = req.params;
+  if (!userId) {
+    return res.status(404).json({
+      error: true,
+      message: `No user found with ID ${userId}`,
+    });
+  }
+
+  try {
+    await knex.transaction(async (trx) => {
+      const { routineName, exercises } = req.body;
+
+      // Insert new completed routine entry and get its id with array destructuring
+      const [routineId] = await trx("routine").insert({
+        name: routineName,
+        user_id: userId,
+      });
+     
+      // For each exercise_name, get exercise id
+      for (const exercise of exercises) {
+        const [exerciseId] = await trx("exercise").insert({
+          name: exercise.exercise_name,
+        });
+       
+       const[exerciseRoutineId] = await trx("exercise_routine").insert({
+          exercise_id: exerciseId,
+          routine_id: routineId,
+        });
+
+        for (const set of exercise.sets) {
+          await trx("set").insert({ weight: set.weight, rep: set.reps, exercise_routine_id: exerciseRoutineId});
+        }
+      }
+      await trx.commit();
+      res.status(200).json({message:"Routine is successfully completed"})
+    });
+  } catch (err) {
+    trx.rollback();
+    res.status(500).json({
+      error: true,
+      message: `Error posting this routine for user with ID: ${req.params.userId}`,
+      details: `${err.message}`,
+    });
+  }
+};
 
 module.exports = {
   routines,
   histories,
   historyDetails,
   exercises,
+  newCompletedRoutine,
 };
