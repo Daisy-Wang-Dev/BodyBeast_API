@@ -22,6 +22,7 @@ const routines = async (req, res) => {
         "routine.created_at"
       )
       .havingRaw("routine.created_at = MAX(routine.created_at)");
+      
 
     res.status(200).json(userRoutines);
   } catch (err) {
