@@ -14,7 +14,7 @@ const exerciseData = async (req, res) => {
       .join("routine", "exercise_routine.routine_id", "=", "routine.id")
       .join("user", "routine.user_id", "=", "user.id")
       .select("exercise.name")
-      .groupBy("exercise.id")
+      .groupBy("exercise.name")
       .where({ user_id: req.params.userId });
 
     // Get volume data for each exercise
