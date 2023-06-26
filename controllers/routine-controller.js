@@ -14,15 +14,15 @@ const routines = async (req, res) => {
         "routine.created_at"
       )
       .where({ user_id: req.params.userId })
-      .orderBy("routine.created_at", "desc")
-      .groupBy(
-        "routine.user_id",
-        "routine.id",
-        "routine.name",
-        "routine.created_at"
-      )
-      .havingRaw("routine.created_at = MAX(routine.created_at)");
-      
+      .andWhere((qb) => {
+        qb.where(
+          "routine.created_at",
+          "=",
+          knex("routine")
+            .max("created_at")
+            .where({ user_id: req.params.userId })
+        );
+      });
 
     res.status(200).json(userRoutines);
   } catch (err) {
