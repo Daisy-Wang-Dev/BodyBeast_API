@@ -45,7 +45,9 @@ const histories = async (req, res) => {
         "routine.user_id",
         "routine.name",
         knex.raw("DATE_FORMAT(routine.created_at, '%Y-%m-%d') AS created_at")
-      );
+      )
+      .orderBy("routine.created_at", "desc")
+      ;
     res.status(200).json(routineHistories);
   } catch (err) {
     res.status(500).json({
