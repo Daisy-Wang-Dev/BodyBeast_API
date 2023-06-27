@@ -14,14 +14,12 @@ const routines = async (req, res) => {
         "routine.created_at"
       )
       .where({ user_id: req.params.userId })
-      .andWhere((qb) => {
-        qb.where(
-          "routine.created_at",
-          "=",
-          knex("routine")
-            .max("created_at")
-            .where({ user_id: req.params.userId })
-        );
+      .groupBy("routine.name","routine.id" )
+      .orderBy("routine.created_at", "desc")
+      .whereIn("routine.created_at", function () {
+        this.select(knex.raw("MAX(created_at)"))
+        .from("routine")
+        .groupBy("name");
       });
 
     res.status(200).json(userRoutines);
@@ -46,8 +44,7 @@ const histories = async (req, res) => {
         "routine.name",
         knex.raw("DATE_FORMAT(routine.created_at, '%Y-%m-%d') AS created_at")
       )
-      .orderBy("routine.created_at", "desc")
-      ;
+      .orderBy("routine.created_at", "desc");
     res.status(200).json(routineHistories);
   } catch (err) {
     res.status(500).json({
@@ -163,7 +160,7 @@ const exercises = async (req, res) => {
 
 // Post completed routine and all exercise details as new entries
 const newCompletedRoutine = async (req, res) => {
-  const {userId} = req.params;
+  const { userId } = req.params;
   if (!userId) {
     return res.status(404).json({
       error: true,
@@ -180,24 +177,28 @@ const newCompletedRoutine = async (req, res) => {
         name: routineName,
         user_id: userId,
       });
-     
+
       // For each exercise_name, get exercise id
       for (const exercise of exercises) {
         const [exerciseId] = await trx("exercise").insert({
           name: exercise.exercise_name,
         });
-       
-       const[exerciseRoutineId] = await trx("exercise_routine").insert({
+
+        const [exerciseRoutineId] = await trx("exercise_routine").insert({
           exercise_id: exerciseId,
           routine_id: routineId,
         });
 
         for (const set of exercise.sets) {
-          await trx("set").insert({ weight: set.weight, rep: set.reps, exercise_routine_id: exerciseRoutineId});
+          await trx("set").insert({
+            weight: set.weight,
+            rep: set.reps,
+            exercise_routine_id: exerciseRoutineId,
+          });
         }
       }
       await trx.commit();
-      res.status(200).json({message:"Routine is successfully completed"})
+      res.status(200).json({ message: "Routine is successfully completed" });
     });
   } catch (err) {
     trx.rollback();
