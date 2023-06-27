@@ -67,7 +67,8 @@ const historyDetails = async (req, res) => {
         "routine.name",
         knex.raw("DATE_FORMAT(routine.created_at, '%Y-%m-%d') AS created_at")
       )
-      .where({ user_id: req.params.userId });
+      .where({ user_id: req.params.userId })
+      .where("routine.id", req.params.routineId);
 
     // Get exercises for a given routine
     const exerciseInRoutine = await knex("routine")
